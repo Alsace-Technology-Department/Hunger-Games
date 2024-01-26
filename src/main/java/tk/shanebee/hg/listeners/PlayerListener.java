@@ -17,14 +17,28 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import tk.shanebee.hg.HG;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class PlayerListener implements Listener {
 
+    private final HG plugin;
+    public PlayerListener(HG plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        if (Objects.requireNonNull(e.getItem()).getType() == Material.EXPERIENCE_BOTTLE) {
+            return;
+        }
+        if (Objects.requireNonNull(e.getClickedBlock()).getBlockData().getMaterial() == Material.ANVIL) {
             return;
         }
         if (Objects.requireNonNull(e.getClickedBlock()).getState() instanceof Chest) {
@@ -138,6 +152,11 @@ public class PlayerListener implements Listener {
         if (player != null && e.getEntity().getType().toString().toUpperCase().contains("ARMOR_STAND") && !player.isOp()) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        event.getPlayer().teleport(plugin.getArenaConfig().getSpawnLocation());
     }
 
 }

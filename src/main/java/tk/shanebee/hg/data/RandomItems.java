@@ -50,28 +50,16 @@ public class RandomItems {
             int cost = 1;
             int rarity = 1;
             if (s.contains("cost:") && s.contains("rarity:")) {
-                int costStartIndex = s.indexOf("cost:") + 5;
-                int costEndIndex = s.indexOf(' ', costStartIndex) == -1 ? s.length() : s.indexOf(' ', costStartIndex);
-                String costStr = s.substring(costStartIndex, costEndIndex);
-                cost = Integer.parseInt(costStr);
-                int rarityStartIndex = s.indexOf("rarity:") + 7;
-                int rarityEndIndex = s.indexOf(' ', rarityStartIndex) == -1 ? s.length() : s.indexOf(' ', rarityStartIndex);
-                String rarityStr = s.substring(rarityStartIndex, rarityEndIndex);
-                rarity = Integer.parseInt(rarityStr);
+                cost = getCost(s);
+                rarity = getRarity(s);
             }
             else if (s.contains("cost:")) {
                 Util.log("Item definition %s doesn't contain a rarity! Defaulting to 1...", s);
-                int costStartIndex = s.indexOf("cost:") + 5;
-                int costEndIndex = s.indexOf(' ', costStartIndex) == -1 ? s.length() : s.indexOf(' ', costStartIndex);
-                String costStr = s.substring(costStartIndex, costEndIndex);
-                cost = Integer.parseInt(costStr);
+                cost = getCost(s);
             }
             else if (s.contains("rarity:")) {
                 Util.log("Item definition %s doesn't contain a cost! Defaulting to 1...", s);
-                int rarityStartIndex = s.indexOf("rarity:") + 7;
-                int rarityEndIndex = s.indexOf(' ', rarityStartIndex) == -1 ? s.length() : s.indexOf(' ', rarityStartIndex);
-                String rarityStr = s.substring(rarityStartIndex, rarityEndIndex);
-                rarity = Integer.parseInt(rarityStr);
+                rarity = getRarity(s);
             }
             else {
                 Util.log("Item definition %s doesn't contain a cost or a rarity! Defaulting to 1...", s);
@@ -81,6 +69,24 @@ public class RandomItems {
             costMap.put(readItem, cost);
             rarityMap.put(readItem, rarity);
         }
+    }
+
+    private int getRarity(String s) {
+        int rarity;
+        int rarityStartIndex = s.indexOf("rarity:") + 7;
+        int rarityEndIndex = s.indexOf(' ', rarityStartIndex) == -1 ? s.length() : s.indexOf(' ', rarityStartIndex);
+        String rarityStr = s.substring(rarityStartIndex, rarityEndIndex);
+        rarity = Integer.parseInt(rarityStr);
+        return rarity;
+    }
+
+    private int getCost(String s) {
+        int cost;
+        int costStartIndex = s.indexOf("cost:") + 5;
+        int costEndIndex = s.indexOf(' ', costStartIndex) == -1 ? s.length() : s.indexOf(' ', costStartIndex);
+        String costStr = s.substring(costStartIndex, costEndIndex);
+        cost = Integer.parseInt(costStr);
+        return cost;
     }
 
 }

@@ -30,6 +30,7 @@ public class ArenaConfig {
 	private FileConfiguration arenadat = null;
 	private File customConfigFile = null;
 	private final HG plugin;
+	private Location spawnLocation;
 
 	public ArenaConfig(HG plugin) {
 		this.plugin = plugin;
@@ -230,6 +231,7 @@ public class ArenaConfig {
 							location = game.getLobbyLocation().getWorld().getSpawnLocation();
 						}
 						gameArenaData.setExit(location);
+						spawnLocation = location;
 					} catch (Exception exception) {
 					    World mainWorld = Bukkit.getWorlds().get(0);
 						gameArenaData.setExit(mainWorld.getSpawnLocation());
@@ -258,6 +260,10 @@ public class ArenaConfig {
 	public Location getSLoc(String s) {
 		String[] h = s.split(":");
 		return new Location(Bukkit.getServer().getWorld(h[0]), Integer.parseInt(h[1]), Integer.parseInt(h[2]), Integer.parseInt(h[3]));
+	}
+
+	public Location getSpawnLocation() {
+		return spawnLocation;
 	}
 
 }
