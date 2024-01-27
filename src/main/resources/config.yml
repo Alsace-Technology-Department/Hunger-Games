@@ -61,6 +61,7 @@ settings:
     enable-force-start-item: true
     # Item that is shown for leave
     leave-item-type: RED_BED
+    lobby-item-type: OAK_DOOR
     # Item that is shown to force start game
     force-start-item-type: NETHER_STAR
 team:

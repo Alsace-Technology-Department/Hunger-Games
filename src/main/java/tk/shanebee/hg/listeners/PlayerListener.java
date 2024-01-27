@@ -14,20 +14,27 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import tk.shanebee.hg.HG;
+import tk.shanebee.hg.data.Config;
+import tk.shanebee.hg.data.Language;
+import tk.shanebee.hg.managers.PlayerManager;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class PlayerListener implements Listener {
 
     private final HG plugin;
+    private final PlayerManager playerManager;
+    private final Language lang;
+
     public PlayerListener(HG plugin) {
         this.plugin = plugin;
+        this.playerManager = plugin.getPlayerManager();
+        this.lang = plugin.getLang();
     }
 
     @EventHandler
@@ -35,7 +42,7 @@ public class PlayerListener implements Listener {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        if (Objects.requireNonNull(e.getItem()).getType() == Material.EXPERIENCE_BOTTLE) {
+        if (e.getItem() != null && e.getItem().getType() == Material.EXPERIENCE_BOTTLE) {
             return;
         }
         if (Objects.requireNonNull(e.getClickedBlock()).getBlockData().getMaterial() == Material.ANVIL) {
@@ -156,7 +163,51 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().teleport(plugin.getArenaConfig().getSpawnLocation());
+        Player player = event.getPlayer();
+        player.teleport(plugin.getArenaConfig().getSpawnLocation());
+        if (Config.enableleaveitem) {
+            ItemStack leaveitem = new ItemStack(Objects.requireNonNull(Material.getMaterial(Config.lobbyitemtype)), 1);
+            ItemMeta commeta = leaveitem.getItemMeta();
+            assert commeta != null;
+            commeta.setDisplayName(lang.leave_game);
+            leaveitem.setItemMeta(commeta);
+            player.getInventory().setItem(8, leaveitem);
+        }
     }
 
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getClick().isKeyboardClick()) {
+            e.setCancelled(true);
+        }
+        if (!(e.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) e.getWhoClicked();
+        if (!playerManager.hasPlayerData(player)) {
+            if (e.getClickedInventory() != null) {
+                ItemStack itemStack = e.getClickedInventory().getItem(e.getSlot());
+                if (itemStack != null) {
+                    if (Objects.equals(itemStack.getType(), Material.getMaterial(Config.lobbyitemtype))) {
+                        player.kickPlayer("Back to Lobby");
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerClick(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (!playerManager.hasPlayerData(player) && event.getItem() != null) {
+            if (event.getItem().getType().equals(Material.getMaterial(Config.lobbyitemtype))) {
+                player.kickPlayer("Back to Lobby");
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if (!event.getPlayer().isOp()) {
+            event.setCancelled(true);
+        }
+    }
 }

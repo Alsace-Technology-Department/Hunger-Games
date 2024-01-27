@@ -41,6 +41,7 @@ public class Config {
     public static boolean enableleaveitem;
     public static boolean enableforcestartitem;
     public static String leaveitemtype;
+    public static String lobbyitemtype;
     public static String forcestartitem;
 
     //Team info
@@ -134,6 +135,7 @@ public class Config {
         enableleaveitem = config.getBoolean("settings.enable-leave-item");
         enableforcestartitem = config.getBoolean("settings.enable-force-start-item");
         leaveitemtype = config.getString("settings.leave-item-type");
+        lobbyitemtype = config.getString("settings.lobby-item-type");
         forcestartitem = config.getString("settings.force-start-item-type");
 
         // Team
